@@ -1,0 +1,51 @@
+---
+title: "GLOE-Seq analysis"
+output: html_notebook
+---
+
+```{r message=FALSE}
+
+library(wigglescout)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(ggpubr)
+library(GenomicRanges)
+
+
+source('../lib/lib_embed_data.v1.0.R')
+
+data_path <- '/Volumes/DATA/DATA/GLOE/GLOE/replicates/'
+
+replicates <- c("WT-UT-1-1","WT-UT-1-2","WT-UT-1-3","WT-20-2-1","WT-20-2-2","WT-20-2-3","WT-24hr-3-1","WT-24hr-3-2","WT-24hr-3-3","KO-UT-4-1","KO-UT-4-2","KO-UT-4-3","KO-20-5-1","KO-20-5-2","KO-20-5-3","KO-24hr-6-1","KO-24hr-6-2","KO-24hr-6-3")
+samples <- c("WT-UT-1","WT-20-2","WT-24hr-3","KO-UT-4","KO-20-5","KO-24hr-6")
+
+build_filenames <- function(path, cond) {
+  files <- paste0(path,"/GL-",cond,".hg19.bs50.bw")
+  labels <- paste0("GLOE ", cond)
+  return(data.frame(files=files,labels=labels))
+}
+
+build_filenames_plus <- function(path, cond) {
+  files <- paste0(path,"/GL-",cond,".hg19.R1plus.bw")
+  labels <- paste0("GLOE (+) ", cond)
+  return(data.frame(files=files,labels=labels))
+}
+
+build_filenames_minus <- function(path, cond) {
+  files <- paste0(path,"//GL-",cond,".hg19.R1minus.bw")
+  labels <- paste0("GLOE (-) ", cond)
+  return(data.frame(files=files,labels=labels))
+}
+
+```
+
+## Pileup regions = 'breakpoints'
+```{r fig.width = 10, fig.height = 2}
+
+fn <- build_filenames(data_path,samples)
+plot_bw_profile(bwfile = fn$files[c(1,3,6)], mode = "stretch",upstream = 2500, downstream = 2500, loci = "../genome/RefGene_uniqueTSS.lt10kb.hg19.bed", bin_size = 100, verbose = F, remove_top = 0.001)
+
+```
+
+

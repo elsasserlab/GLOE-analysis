@@ -38,11 +38,69 @@ build_filenames_minus <- function(path, cond) {
   return(data.frame(files=files,labels=labels))
 }
 
-
 ```
 
-## ChromHMM overview
-```{r fig.width = 4, fig.height = 4}
+## Published peaksets (Cistrome)
+```{r fig.width = 8, fig.height = 2}
 fn <- build_filenames(data_path,samples)
 
+p1 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_ATACseq.hg19.bed", bin_size = 10 ,remove_top = 0.001, verbose=F)
+p2 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10 ,remove_top = 0.001, verbose=F)
+p3 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_TOPI.hg19.bed", bin_size = 10 ,remove_top = 0.001, verbose=F)
+
+ggarrange(p1, p2, p3, ncol = 3, nrow = 1)
 ```
+
+## Pileup regions = 'breakpoints'
+```{r fig.width = 8, fig.height = 2}
+
+fn <- build_filenames(data_path,samples)
+
+p1 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F) + scale_y_continuous(limits=c(0,45))
+p3 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.shuffled.bed", bin_size = 10, verbose = F) + scale_y_continuous(limits=c(0,45))
+
+fn <- build_filenames(data_path,replicates[c(7,8,9,16,17,18)])
+p2 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F) + scale_y_continuous(limits=c(0,45))
+
+embed_plot(p1,"CAD-peaks")
+embed_plot(p1,"CAD-peaks.rep")
+embed_plot(p1,"CAD-ctrl")
+
+ggarrange(p1, p2, p3, ncol = 3, nrow = 1)
+```
+## Pileup regions = 'breakpoints'
+```{r fig.width = 10, fig.height = 2}
+
+fn <- build_filenames(data_path,samples)
+p1 <- plot_bw_heatmap(bwfile = fn$files[1], mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F,zmax = 50)
+p2 <- plot_bw_heatmap(bwfile = fn$files[2], mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F,zmax = 50)
+p3 <- plot_bw_heatmap(bwfile = fn$files[3], mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F,zmax = 50)
+p4 <- plot_bw_heatmap(bwfile = fn$files[4], mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F,zmax = 50)
+p5 <- plot_bw_heatmap(bwfile = fn$files[5], mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F,zmax = 50)
+p6 <- plot_bw_heatmap(bwfile = fn$files[6], mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F,zmax = 50)
+
+
+ggarrange(p1, p2, p3, p4, p5, p6, ncol = 6, nrow = 1)
+```
+
+## Scatter Plots
+
+```{r  fig.width = 12, fig.height = 6, fig.show="hold", warning=F}
+
+plus <- build_filenames_plus(data_path,samples)
+minus <- build_filenames_minus(data_path,samples)
+
+plot_bw_profile(bwfiles = plus$files,labels = plus$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F)
+
+p3 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.shuffled.bed", bin_size = 10, verbose = F) + scale_y_continuous(limits=c(0,45))
+
+fn <- build_filenames(data_path,replicates[c(7,8,9,16,17,18)])
+p2 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F) + scale_y_continuous(limits=c(0,45))
+
+embed_plot(p1,"CAD-peaks")
+embed_plot(p1,"CAD-peaks.rep")
+embed_plot(p1,"CAD-ctrl")
+
+ggarrange(p1, p2, p3, ncol = 3, nrow = 1)
+```
+
