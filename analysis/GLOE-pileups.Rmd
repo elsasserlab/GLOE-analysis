@@ -3,7 +3,7 @@ title: "GLOE-Seq analysis"
 output: html_notebook
 ---
 
-```{r warning=FALSE}
+```{r message=FALSE}
 
 library(wigglescout)
 library(ggplot2)
@@ -16,6 +16,7 @@ library(GenomicRanges)
 source('../lib/lib_embed_data.v1.0.R')
 
 data_path <- '/Volumes/DATA/DATA/GLOE/GLOE/replicates/'
+atac_path <- '/Volumes/DATA/DATA/GLOE/ATAC/'
 
 replicates <- c("WT-UT-1-1","WT-UT-1-2","WT-UT-1-3","WT-20-2-1","WT-20-2-2","WT-20-2-3","WT-24hr-3-1","WT-24hr-3-2","WT-24hr-3-3","KO-UT-4-1","KO-UT-4-2","KO-UT-4-3","KO-20-5-1","KO-20-5-2","KO-20-5-3","KO-24hr-6-1","KO-24hr-6-2","KO-24hr-6-3")
 samples <- c("WT-UT-1","WT-20-2","WT-24hr-3","KO-UT-4","KO-20-5","KO-24hr-6")
@@ -40,21 +41,6 @@ build_filenames_minus <- function(path, cond) {
 
 ```
 
-## Published peaksets (Cistrome)
-
-Here, we are comparing profiles accross known accessible, DNAase hypersensitive regions, and CTCF peaks
-*Note: unlike in previous plots, we clearly see now a correlation of CAD activity and accessible chromatin. Plotting average profiles on scarce read data can be thrown of by artifact regions. These artifacts are avoided here by 1) using a blacklist to remove known repetitive/artifact-prone regions and 2) removing outliers (top 0.1%) of the signal before averaging.*
-
-```{r fig.width = 8, fig.height = 2}
-fn <- build_filenames(data_path,samples)
-
-p1 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_ATACseq.hg19.bed", bin_size = 10 ,remove_top = 0.001, verbose=F)
-p2 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10 ,remove_top = 0.001, verbose=F)
-p3 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10 ,remove_top = 0.001, verbose=F)
-
-ggarrange(p1, p2, p3, ncol = 3, nrow = 1)
-```
-
 ## Pileup regions = 'hypersensitive breakpoints'
 
 Given the overall low coverage/incidence of SSB in the genome, a coincidence of several SSBs in the same location (or even exact same base pair) is highly unlikely to occur by chance. Noticing that around CTCF sites, uniqe GLOE-Seq reads piled up neatly (some with exact same starting base), I developed a pipeline that looks for such pileups. There are ~40 of these regions identified, which I would call 'hypersensitive'. There may be many more but it is not possible to call them confidently.
@@ -69,11 +55,8 @@ p3 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upst
 fn <- build_filenames(data_path,replicates[c(7,8,9,16,17,18)])
 p2 <- plot_bw_profile(bwfiles = fn$files,labels = fn$labels,mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup/GL-WT-24hr-3.pile_up3_s10_u.uniq.bed", bin_size = 10, verbose = F) + scale_y_continuous(limits=c(0,45))
 
-embed_plot(p1,"CAD-peaks")
-embed_plot(p1,"CAD-peaks.rep")
-embed_plot(p1,"CAD-ctrl")
-
 ggarrange(p1, p2, p3, ncol = 3, nrow = 1)
+embed_last_plot("pileup-peaks")
 ```
 Heatmaps of the same regions
 ```{r fig.width = 10, fig.height = 2}
@@ -88,55 +71,41 @@ p6 <- plot_bw_heatmap(bwfile = fn$files[6], mode = "center",upstream = 1000, dow
 
 
 ggarrange(p1, p2, p3, p4, p5, p6, ncol = 6, nrow = 1)
+embed_last_plot("pileup-heatmap")
 ```
-
-## CTCF sites - spacing  relative to nucleosomes and linker histone
-
-around CTCF sites, the GLOE-seq signal looked very periodic, which suggested that there could be a relationship to nucleosome occupancy. Indeed, the pattern is consistent with CAD cutting left and right of linker histone / in-between linker histone and nucleosome. Note that the same periodicity is also seen in untreated and CAD KO conditions, albeit much less pronounced, suggesting that CAD-independent SSBs are also occuring more often in-between nucleosomes.
-
-```{r  fig.width = 12, fig.height = 8, fig.show="hold", warning=F}
-
-plus <- build_filenames_plus(data_path,samples)
-minus <- build_filenames_minus(data_path,samples)
-
+```{r fig.width = 10, fig.height = 2}
 histones <- c('/Volumes/DATA/DATA/GLOE/GLOE/GEO/Torres2016_H10_1.hg19.bw','/Volumes/DATA/DATA/GLOE/GLOE/GEO/Torres2016_H14_2.hg19.bw','/Volumes/DATA/DATA/GLOE/GLOE/GEO/U2OS_AcH3_ChIPseq.hg19.bw')
 
-p1<- plot_bw_profile(bwfiles = histones[1],labels = c("H1.0"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
-
-p2<- plot_bw_profile(bwfiles = histones[2],labels = c("H1.4"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
-
-p3<- plot_bw_profile(bwfiles = histones[3],labels = c("H3ac"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
-
-p4<- plot_bw_profile(bwfiles = c(plus$files[3],minus$files[3]),labels = c("WT 24h +","WT 24h -"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
-
-p5 <- plot_bw_profile(bwfiles = plus$files[c(1,3,6)],labels = plus$labels[c(1,3,6)],mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
-
-p6 <- plot_bw_profile(bwfiles = minus$files[c(1,3,6)],labels = minus$labels[c(1,3,6)],mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_CTCF.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
-
-ggarrange(p1, p2, p3, p4, p5, p6, ncol = 3, nrow = 2)
+plot_bw_profile(bwfiles = histones[1],labels = "H1.0", mode = "start" ,upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 10, verbose = F)
 ```
-## DNase hypersensitive sites - spacing  relative to nucleosomes and linker histone
 
-With the removal of artifactual regions, we now also can see a neatly spaced pattern at DNAse hypersensitive sites.
 
-```{r  fig.width = 12, fig.height = 8, fig.show="hold", warning=F}
+```{r fig.width = 6, fig.height = 3}
 
-plus <- build_filenames_plus(data_path,samples)
-minus <- build_filenames_minus(data_path,samples)
+atac <- data.frame(
+    files=c("WT-NT-01.hg19.bw","WT-NT-02.hg19.bw","WT-NT-03.hg19.bw","WT-IR-01.hg19.bw","WT-IR-03.hg19.bw","CAD-NT-01.hg19.bw","CAD-NT-02.hg19.bw","CAD-NT-03.hg19.bw","CAD-IR-01.hg19.bw","CAD-IR-02.hg19.bw"),
+    labels=c("ATAC WT-UT-1","ATAC WT-UT-2","ATAC WT-UT-3","ATAC WT-24h-1","ATAC WT-24h-2","ATAC KO-NT-1","ATAC KO-NT-2","ATAC KO-NT-3","ATAC KO-24h-1","ATAC KO-24h-2"))
 
-histones <- c('/Volumes/DATA/DATA/GLOE/GLOE/GEO/Torres2016_H10_1.hg19.bw','/Volumes/DATA/DATA/GLOE/GLOE/GEO/Torres2016_H14_2.hg19.bw','/Volumes/DATA/DATA/GLOE/GLOE/GEO/U2OS_AcH3_ChIPseq.hg19.bw')
+atac$files <- paste0(atac_path,atac$files)
 
-p1<- plot_bw_profile(bwfiles = histones[1],labels = c("H1.0"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
+p1 <- plot_bw_profile(bwfiles = atac$files[c(1,4,7,9)],labels = atac$labels[c(1,4,7,9)],mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_ATACseq.hg19.bed", bin_size = 50, verbose = F) 
 
-p2<- plot_bw_profile(bwfiles = histones[2],labels = c("H1.4"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
+p2 <- plot_bw_profile(bwfiles = atac$files[c(1,4,7,9)],labels = atac$labels[c(1,4,7,9)],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F)
 
-p3<- plot_bw_profile(bwfiles = histones[3],labels = c("H3ac"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
+ggarrange(p1, p2, ncol = 2, nrow = 1)
+embed_last_plot("pileup-atac-profile")
+```
 
-p4<- plot_bw_profile(bwfiles = c(plus$files[3],minus$files[3]),labels = c("WT 24h +","WT 24h -"),mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
+```{r fig.width = 8, fig.height = 2}
 
-p5 <- plot_bw_profile(bwfiles = plus$files[c(1,3,6)],labels = plus$labels[c(1,3,6)],mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
+p1 <- plot_bw_heatmap(bwfile = atac$files[1],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
 
-p6 <- plot_bw_profile(bwfiles = minus$files[c(1,3,6)],labels = minus$labels[c(1,3,6)],mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_DHS.hg19.bed", bin_size = 10, verbose = F, remove_top = 0.0001)
+p2 <- plot_bw_heatmap(bwfile = atac$files[4],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
 
-ggarrange(p1, p2, p3, p4, p5, p6, ncol = 3, nrow = 2)
+p3 <- plot_bw_heatmap(bwfile = atac$files[7],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p4 <- plot_bw_heatmap(bwfile = atac$files[9],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+ggarrange(p1, p2, p3, p4, ncol = 4, nrow = 1)
+embed_last_plot("pileup-atac-heatmap")
 ```

@@ -1,0 +1,35 @@
+---
+title: "GLOE-seq analysis reads under pileup"
+output: html_notebook
+---
+
+```{r message=FALSE}
+
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(ggpubr)
+library(elsasserlib)
+
+source('../lib/lib_embed_data.v1.0.R')
+
+```
+
+```{r}
+df <- read.delim("../data/read_fraction_under_pileup/pile_up3_fraction.txt",header = F)
+colnames(df) <- c("condition","total","fltd","pileup")
+df$frac <- df$pileup/df$fltd * 100
+
+comp <- list(c("WT UT","WT 24hr"), c("WT 24hr", "KO 24hr"))
+
+compare_means(frac ~ condition, p.adjust.method = "none", data = df,method = "t.test",paired = F)
+```
+
+```{r fig.width = 5, fig.height = 5}
+ggbarplot(df,x = "condition", y="frac", add=c("mean_se", "jitter")) + theme_elsasserlab_print()
+
+embed_last_plot("frac_under_pile")
+```
+
+
+

@@ -1,0 +1,17 @@
+   1 NC
+   3 AT
+   3 TC
+   4 CG
+   4 TG
+   5 GG
+   6 CT
+   6 GC
+   9 GA
+  10 GT
+  11 AG
+  16 AC
+  21 TA
+  22 CC
+  23 CA
+  28 AA
+  36 TT
