@@ -1,0 +1,7 @@
+condition	plus_peaks_all	plus_peaks_downsampled	plus_peaks_unique	minus_peaks_all	minus_peaks_downsampled	minus_peaks_unique	co_peaks	co_peaks_unique	reads_under_unique_peaks
+WT UT	904	498	442	1047	569	481	33	6	3034
+WT 20	1357	552	506	1432	586	510	23	2	3243
+WT 24hr	855	780	708	850	770	663	81	47	4991
+KO UT	1223	527	479	1366	621	557	24	2	3293
+KO 20	538	380	311	590	441	342	34	2	2113
+KO 24hr	460	360	286	495	395	295	31	1	1837

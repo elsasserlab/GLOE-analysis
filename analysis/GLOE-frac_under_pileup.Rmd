@@ -16,7 +16,7 @@ source('../lib/lib_embed_data.v1.0.R')
 ```
 
 ```{r}
-df <- read.delim("../data/read_fraction_under_pileup/pile_up3_fraction.txt",header = F)
+df <- read.delim("../data/pileup-analysis/pileup_fractions.txt",header = F)
 colnames(df) <- c("condition","total","fltd","pileup")
 df$frac <- df$pileup/df$fltd * 100
 
@@ -26,7 +26,8 @@ compare_means(frac ~ condition, p.adjust.method = "none", data = df,method = "t.
 ```
 
 ```{r fig.width = 5, fig.height = 5}
-ggbarplot(df,x = "condition", y="frac", add=c("mean_se", "jitter")) + theme_elsasserlab_print()
+ggbarplot(df,x = "condition", y="frac", add=c("mean_se", "jitter")) + stat_compare_means(comparisons = comp,method = "t.test",bracket.size = ) +
+theme_elsasserlab_print()
 
 embed_last_plot("frac_under_pile")
 ```

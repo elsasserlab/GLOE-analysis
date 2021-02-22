@@ -1,0 +1,16 @@
+    227 TT
+    215 AA
+    209 GA
+    189 AG
+    154 AT
+    153 TG
+    152 GT
+    149 TA
+    143 GG
+    119 CA
+    104 CT
+     86 TC
+     82 AC
+     62 GC
+     48 CC
+     21 CG
