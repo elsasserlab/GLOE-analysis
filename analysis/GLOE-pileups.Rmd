@@ -80,7 +80,7 @@ plot_bw_profile(bwfiles = histones[1],labels = "H1.0", mode = "start" ,upstream 
 ```
 
 
-```{r fig.width = 6, fig.height = 3}
+```{r fig.width = 8, fig.height = 2}
 
 atac <- data.frame(
     files=c("WT-NT-01.hg19.bw","WT-NT-02.hg19.bw","WT-NT-03.hg19.bw","WT-IR-01.hg19.bw","WT-IR-03.hg19.bw","CAD-NT-01.hg19.bw","CAD-NT-02.hg19.bw","CAD-NT-03.hg19.bw","CAD-IR-01.hg19.bw","CAD-IR-02.hg19.bw"),
@@ -90,22 +90,45 @@ atac$files <- paste0(atac_path,atac$files)
 
 p1 <- plot_bw_profile(bwfiles = atac$files[c(1,4,7,9)],labels = atac$labels[c(1,4,7,9)],mode = "center",upstream = 1000, downstream = 1000, loci = "../genome/HCT116_ATACseq.hg19.bed", bin_size = 50, verbose = F) 
 
-p2 <- plot_bw_profile(bwfiles = atac$files[c(1,4,7,9)],labels = atac$labels[c(1,4,7,9)],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F)
+p2 <- plot_bw_profile(bwfiles = atac$files[c(1,4,7,9)],labels = atac$labels[c(1,4,7,9)],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.copeaks.uniq.bed", bin_size = 50, verbose = F)
 
-ggarrange(p1, p2, ncol = 2, nrow = 1)
+p3 <- plot_bw_profile(bwfiles = atac$files[c(1,4,7,9)],labels = atac$labels[c(1,4,7,9)],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F)
+
+ggarrange(p1, p2, p3, ncol = 3, nrow = 1)
 embed_last_plot("pileup-atac-profile")
 ```
 
 ```{r fig.width = 8, fig.height = 2}
 
-p1 <- plot_bw_heatmap(bwfile = atac$files[1],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
+p1 <- plot_bw_heatmap(bwfile = atac$files[1],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.copeaks.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
 
-p2 <- plot_bw_heatmap(bwfile = atac$files[4],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
+p2 <- plot_bw_heatmap(bwfile = atac$files[4],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.copeaks.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
 
-p3 <- plot_bw_heatmap(bwfile = atac$files[7],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
+p3 <- plot_bw_heatmap(bwfile = atac$files[7],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.copeaks.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
 
-p4 <- plot_bw_heatmap(bwfile = atac$files[9],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/motif_pileup3/GL-WT-24hr-3.pileup.reads.bed", bin_size = 50, verbose = F, zmax = 45) 
+p4 <- plot_bw_heatmap(bwfile = atac$files[9],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.copeaks.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
 
 ggarrange(p1, p2, p3, p4, ncol = 4, nrow = 1)
+embed_last_plot("copeaks-atac-heatmap")
+```
+```{r fig.width = 8, fig.height = 4}
+
+p1 <- plot_bw_heatmap(bwfile = fn$files[1],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p2 <- plot_bw_heatmap(bwfile = fn$files[3],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p3 <- plot_bw_heatmap(bwfile = fn$files[4],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p4 <- plot_bw_heatmap(bwfile = fn$files[6],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p5 <- plot_bw_heatmap(bwfile = atac$files[1],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p6 <- plot_bw_heatmap(bwfile = atac$files[4],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p7 <- plot_bw_heatmap(bwfile = atac$files[7],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+p8 <- plot_bw_heatmap(bwfile = atac$files[9],mode = "center",upstream = 1000, downstream = 1000, loci = "../data/pileup-analysis/GL-WT-24hr-3.plus.uniq.bed", bin_size = 50, verbose = F, zmax = 45) 
+
+ggarrange(p1, p2, p3, p4, p5, p6, p7, p8, ncol = 4, nrow = 2)
 embed_last_plot("pileup-atac-heatmap")
 ```

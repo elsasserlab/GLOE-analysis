@@ -22,7 +22,7 @@ df$frac <- df$pileup/df$fltd * 100
 
 comp <- list(c("WT UT","WT 24hr"), c("WT 24hr", "KO 24hr"))
 
-compare_means(frac ~ condition, p.adjust.method = "none", data = df,method = "t.test",paired = F)
+compare_means(frac ~ condition, data = df,method = "t.test",p.adjust.method = "bonferroni", paired = F)
 ```
 
 ```{r fig.width = 5, fig.height = 5}
@@ -31,6 +31,17 @@ theme_elsasserlab_print()
 
 embed_last_plot("frac_under_pile")
 ```
+```{r}
+stats <- read.delim("../data/pileup-analysis/pileup_stats.txt",header = T)
 
+stats$unique <- stats$plus_peaks_unique + stats$minus_peaks_unique
+stats$shared <- stats$plus_peaks_downsampled + stats$minus_peaks_downsampled - stats$unique
+
+mdf <- melt(stats[c(3,6),c(1,10,11)])
+
+ggbarplot(mdf,x = "condition", y="value",label = mdf$variable)
+embed_last_plot("stats_piles")
+
+```
 
 
